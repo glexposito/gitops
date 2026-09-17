@@ -35,13 +35,13 @@ applications:
   # values.yaml edit - reuses charts/worker as-is (already generic)
   # instead of a new chart, into its own throwaway namespace with no
   # governance layer of its own (CreateNamespace=true here instead).
-  - name: hello-app
+  - name: hello-world
     path: charts/worker
     destination:
       name: apps
-      namespace: hello-app
+      namespace: hello-world
     helm:
-      releaseName: hello-app
+      releaseName: hello-world
       valueFiles:
         - values.yaml
         - values-dev.yaml
