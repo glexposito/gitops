@@ -1,0 +1,41 @@
+# Fans out worker to every registered workload cluster automatically -
+# the clusters generator discovers cluster Secrets (created by
+# platform-infra's modules/argocd-cluster) matching this label, so
+# registering a new cluster deploys worker to it with zero Git change.
+# The label filter is required: Argo CD's clusters generator also
+# matches the local in-cluster destination (the platform cluster Argo CD
+# itself runs on) by default, which would otherwise put worker on
+# platform too.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: worker-appset
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            workload-cluster: "true"
+  template:
+    metadata:
+      name: 'worker-{{name}}'
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/glexposito/gitops.git
+        targetRevision: HEAD
+        path: charts/worker
+        helm:
+          releaseName: worker
+          valueFiles:
+            - values.yaml
+            - values-dev.yaml
+      destination:
+        name: '{{name}}'
+        namespace: core-workers
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

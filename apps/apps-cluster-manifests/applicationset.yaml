@@ -1,0 +1,38 @@
+# Per-cluster governance manifests (namespaces, quotas, network
+# policies) - fans out to every registered workload cluster the same way
+# worker-appset.yaml does, syncing manifests/<cluster-name>/ for each.
+# Registering a new cluster requires its own manifests/<cluster-name>/
+# folder to exist (this doesn't generate that content, just applies it) -
+# same per-cluster governance model as the original repo's
+# manifests/<cluster>/ + clusters-appset.yaml.
+# Kept separate from worker/hello-world (governance vs workload). Syncs
+# first in practice since it's the smaller/faster Application; the
+# workload Applications' selfHeal retries and succeeds once this has
+# created the namespace, if they ever race on a first-ever apply.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps-cluster-manifests-appset
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            workload-cluster: "true"
+  template:
+    metadata:
+      name: 'cluster-manifests-{{name}}'
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/glexposito/gitops.git
+        targetRevision: HEAD
+        path: 'manifests/{{name}}'
+      destination:
+        name: '{{name}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
