@@ -1,0 +1,29 @@
+# Second app, purely to simulate adding one - reuses charts/worker as-is
+# (already generic) instead of a new chart, into its own throwaway
+# namespace with no governance layer of its own (CreateNamespace=true
+# here instead).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-world
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/glexposito/gitops.git
+    targetRevision: HEAD
+    path: charts/worker
+    helm:
+      releaseName: hello-world
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
+  destination:
+    name: apps
+    namespace: hello-world
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
