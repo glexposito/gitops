@@ -1,0 +1,29 @@
+# First GitOps smoke test: a plain Deployment+Service with no chart, no
+# CRDs, no external dependencies - proves root -> apps sync works end to
+# end before bringing in anything heavier (e.g. a chart needing KEDA
+# installed and a real queue backend).
+#
+# Picked up automatically by the root Application (this repo's argocd/
+# path, recurse: true, created by platform-infra's argocd-bootstrap
+# module) - this file is what "tells Argo CD" about it, nothing else to
+# run or configure.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/glexposito/gitops.git
+    targetRevision: HEAD
+    path: workloads/hello
+  destination:
+    name: apps
+    namespace: hello
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
