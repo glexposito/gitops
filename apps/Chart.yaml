@@ -1,0 +1,5 @@
+apiVersion: v2
+name: apps
+description: App-of-apps bootstrap layer - templates one Application per entry in values.yaml
+type: application
+version: 0.1.0

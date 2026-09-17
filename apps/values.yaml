@@ -1,0 +1,32 @@
+# Shared defaults for every Application below - each entry only states
+# what actually differs (path/name/destination/tool-specific config).
+config:
+  repoURL: https://github.com/glexposito/gitops.git
+  targetRevision: HEAD
+
+applications:
+  # Namespace + quota/limits/network policy for the apps cluster - kept
+  # separate from worker (governance vs workload), same split as the
+  # original repo's clusters-appset.yaml vs core-workers-appset.yaml.
+  # Syncs first in practice since it's the smaller/faster Application;
+  # worker's selfHeal retries and succeeds once this has created the
+  # namespace, if the two ever race on a first-ever apply.
+  - name: apps-cluster-manifests
+    path: manifests/apps
+    destination:
+      name: apps
+
+  # Smoke test: nginxdemos/hello standing in for a real worker image,
+  # structured (chart + values.yaml/values-dev.yaml layering,
+  # core-workers namespace) to match the original repo - swap
+  # image/values here later without changing the shape of anything else.
+  - name: worker
+    path: charts/worker
+    destination:
+      name: apps
+      namespace: core-workers
+    helm:
+      releaseName: worker
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
