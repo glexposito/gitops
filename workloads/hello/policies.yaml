@@ -1,0 +1,44 @@
+# Sized for this namespace's actual content: deployment.yaml runs 1
+# replica at 50m/64Mi requests, 100m/128Mi limits. Quota allows headroom
+# for a rolling update (2 pods briefly) rather than the single replica
+# exactly.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: hello-quota
+  namespace: hello
+spec:
+  hard:
+    requests.cpu: 200m
+    requests.memory: 256Mi
+    limits.cpu: 400m
+    limits.memory: 512Mi
+    pods: "4"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: hello
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 100m
+        memory: 128Mi
+      defaultRequest:
+        cpu: 50m
+        memory: 64Mi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace-only
+  namespace: hello
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
