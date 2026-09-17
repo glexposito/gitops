@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hello-world
+description: Smoke-test chart (nginxdemos/hello) to prove GitOps sync works end to end - not a real workload
+type: application
+version: 0.1.0
+appVersion: "1.0"
