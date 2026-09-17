@@ -1,0 +1,6 @@
+apiVersion: v2
+name: worker
+description: Worker workload chart (currently nginxdemos/hello as a placeholder image, standing in for a real worker)
+type: application
+version: 0.1.0
+appVersion: "1.0"

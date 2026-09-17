@@ -1,0 +1,27 @@
+# Smoke test: nginxdemos/hello standing in for a real worker image, but
+# structured (chart + values.yaml/values-dev.yaml layering, core-workers
+# namespace) to match the original repo - swap image/values here later
+# without changing the shape of anything else.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: worker
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/glexposito/gitops.git
+    targetRevision: HEAD
+    path: charts/worker
+    helm:
+      releaseName: worker
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
+  destination:
+    name: apps
+    namespace: core-workers
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

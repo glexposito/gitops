@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: hello
+  name: core-workers
   labels:
     environment: dev
     managed-by: gitops

@@ -1,0 +1,26 @@
+# Fallback before a stage overlay is applied - every real stage
+# (values-dev.yaml, and later values-stg.yaml/values-prod.yaml) sets
+# replicaCount explicitly rather than relying on this default, same
+# convention as the original repo.
+replicaCount: 0
+
+image:
+  repository: nginxdemos/hello
+  tag: plain-text
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+  containerPort: 80
+
+# Reported via the APP_ENV env var - every stage overlay sets this
+# explicitly so it's never silently left at the default.
+appEnvironment: production
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
