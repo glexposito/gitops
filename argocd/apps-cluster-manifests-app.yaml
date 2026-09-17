@@ -1,0 +1,26 @@
+# Per-cluster governance manifests (namespaces, quotas, network
+# policies) for the apps cluster - same role as the original repo's
+# manifests/<cluster>/ + clusters-appset.yaml, just a plain Application
+# instead of an ApplicationSet since there's only one target cluster so
+# far. Kept separate from worker-app.yaml (governance vs workload), same
+# split as the original's clusters-appset.yaml vs core-workers-appset.yaml.
+# Syncs first in practice since it's the smaller/faster Application;
+# worker-app.yaml's selfHeal will retry and succeed once this has created
+# the namespace, if the two ever race on a first-ever apply.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-cluster-manifests
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/glexposito/gitops.git
+    targetRevision: HEAD
+    path: manifests/apps
+  destination:
+    name: apps
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
