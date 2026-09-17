@@ -30,3 +30,20 @@ applications:
       valueFiles:
         - values.yaml
         - values-dev.yaml
+
+  # Second app, purely to simulate adding one and prove this stays a
+  # values.yaml edit - reuses charts/worker as-is (already generic)
+  # instead of a new chart, into its own throwaway namespace with no
+  # governance layer of its own (CreateNamespace=true here instead).
+  - name: hello-app
+    path: charts/worker
+    destination:
+      name: apps
+      namespace: hello-app
+    helm:
+      releaseName: hello-app
+      valueFiles:
+        - values.yaml
+        - values-dev.yaml
+    syncOptions:
+      - CreateNamespace=true
